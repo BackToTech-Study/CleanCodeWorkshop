@@ -33,26 +33,26 @@ Design patterns help use to write clean code.
 
 Can you understand this function? Why?
 ```python
-    def getCurrentWeather(self, city: str, stateCode: str, countryCode: str) -> Weather or None:
-        location: Geolocation = self.__getGeolocation(city, stateCode, countryCode)
-        if location is None:
-            return None
+def getCurrentWeather(self, city: str, stateCode: str, countryCode: str) -> Weather or None:
+    location: Geolocation = self.__getGeolocation(city, stateCode, countryCode)
+    if location is None:
+        return None
 
-        parameters = {'lat': location.latitude, 'lon': location.longitude, 'units': self.__units,  'appid': self.__apiKey}
-        result = requests.get(self.__dataUrl, params=parameters)
+    parameters = {'lat': location.latitude, 'lon': location.longitude, 'units': self.__units,  'appid': self.__apiKey}
+    result = requests.get(self.__dataUrl, params=parameters)
 
-        if result is None or isNotPositiveResponse(result.status_code):
-            return None
+    if result is None or isNotPositiveResponse(result.status_code):
+        return None
 
-        try:
-            data = result.json()
-            return self.__weatherMapper.fromJson(data)
-        except KeyError as error:
-            self.__logger.error(f"Missing key in weather data for {city},{stateCode},{countryCode}: {error}")
-            return None
-        except Exception as error:
-            self.__logger.error(f"Unexpected weather data for {city},{stateCode},{countryCode}: {error}")
-            return None
+    try:
+        data = result.json()
+        return self.__weatherMapper.fromJson(data)
+    except KeyError as error:
+        self.__logger.error(f"Missing key in weather data for {city},{stateCode},{countryCode}: {error}")
+        return None
+    except Exception as error:
+        self.__logger.error(f"Unexpected weather data for {city},{stateCode},{countryCode}: {error}")
+        return None
 ```
 
 ### Your solution design should be easy to read
@@ -188,65 +188,65 @@ because the invoker and receiver can change independently of each other.
 
 ### Make your code testable by using dependency injection
 ```python
-    def getCurrentWeather(self, city: str, stateCode: str, countryCode: str) -> Weather or None:
+def getCurrentWeather(self, city: str, stateCode: str, countryCode: str) -> Weather or None:
+    ...
+    
+    parameters = {'lat': location.latitude, 'lon': location.longitude, 'units': self.__units,  'appid': self.__apiKey}
+    ...
+
+    try:
         ...
-        
-        parameters = {'lat': location.latitude, 'lon': location.longitude, 'units': self.__units,  'appid': self.__apiKey}
-        ...
-
-        try:
-            ...
-            return self.__weatherMapper.fromJson(data)
-        except KeyError as error:
-            self.__logger.error(f"Missing key in weather data for {city},{stateCode},{countryCode}: {error}")
-            return None
-        except Exception as error:
-            self.__logger.error(f"Unexpected weather data for {city},{stateCode},{countryCode}: {error}")
-            return None
+        return self.__weatherMapper.fromJson(data)
+    except KeyError as error:
+        self.__logger.error(f"Missing key in weather data for {city},{stateCode},{countryCode}: {error}")
+        return None
+    except Exception as error:
+        self.__logger.error(f"Unexpected weather data for {city},{stateCode},{countryCode}: {error}")
+        return None
 ```
 ```python
-    @inject
-    def __init__(self,
-                 weatherConfiguration: WeatherServerConfiguration,
-                 geolocationMapper: GeolocationMappers,
-                 weatherMapper: WeatherMappers,
-                 logger: ILogger):
-        self.__apiKey = weatherConfiguration.ApiKey
-        self.__geoLocationUrl = weatherConfiguration.BaseUrl+weatherConfiguration.GeoLocationEndpoint
-        self.__dataUrl = weatherConfiguration.BaseUrl+weatherConfiguration.DataEndpoint
-        self.__units = weatherConfiguration.Units
-        self.__geolocationMapper = geolocationMapper
-        self.__weatherMapper = weatherMapper
-        self.__logger = logger
+@inject
+def __init__(self,
+             weatherConfiguration: WeatherServerConfiguration,
+             geolocationMapper: GeolocationMappers,
+             weatherMapper: WeatherMappers,
+             logger: ILogger):
+    self.__apiKey = weatherConfiguration.ApiKey
+    self.__geoLocationUrl = weatherConfiguration.BaseUrl+weatherConfiguration.GeoLocationEndpoint
+    self.__dataUrl = weatherConfiguration.BaseUrl+weatherConfiguration.DataEndpoint
+    self.__units = weatherConfiguration.Units
+    self.__geolocationMapper = geolocationMapper
+    self.__weatherMapper = weatherMapper
+    self.__logger = logger
 ```
 
 ```python
-    def configureDependencies(binder):
-        binder.bind(GeolocationMappers, to=GeolocationMappers(), scope=flask_injector.request)
-        binder.bind(WeatherMappers, to=WeatherMappers(), scope=flask_injector.request)
-        binder.bind(WeatherServerConfiguration, to=configuration.WeatherServer, scope=flask_injector.request)
-        binder.bind(ILogger, to=Logger(__name__, configuration.Logger.Level, [getStdOutLogHandler()]), scope=flask_injector.request)
-        binder.bind(IWeatherService, to=WeatherService, scope=flask_injector.request)
+def configureDependencies(binder):
+    binder.bind(GeolocationMappers, to=GeolocationMappers(), scope=flask_injector.request)
+    binder.bind(WeatherMappers, to=WeatherMappers(), scope=flask_injector.request)
+    binder.bind(WeatherServerConfiguration, to=configuration.WeatherServer, scope=flask_injector.request)
+    binder.bind(ILogger, to=Logger(__name__, configuration.Logger.Level, [getStdOutLogHandler()]), scope=flask_injector.request)
+    binder.bind(IWeatherService, to=WeatherService, scope=flask_injector.request)
 ```
 
 ```python
-    def setUp(self):
-        weatherConfiguration: str = ('{'
-                                     '  "BaseUrl": "http://api.openweathermap.org/",'
-                                     '  "GeoLocationEndpoint": "geo/1.0/direct",'
-                                     '  "DataEndpoint": "data/2.5/weather",'
-                                     '  "Units": "metric"'
-                                     '}')
-        self.weatherApiConfiguration: WeatherServerConfiguration = TestWeatherServiceConfigurationFactory().get(weatherConfiguration)
-        
-        self.logger = Logger(__name__, 0, [getStdOutLogHandler()])
-        
-        self.weatherServices = [WeatherService(self.weatherApiConfiguration, GeolocationMappers(), WeatherMappers(), self.logger), BadWeatherServiceExample()]
+def setUp(self):
+    weatherConfiguration: str = ('{'
+                                 '  "BaseUrl": "http://api.openweathermap.org/",'
+                                 '  "GeoLocationEndpoint": "geo/1.0/direct",'
+                                 '  "DataEndpoint": "data/2.5/weather",'
+                                 '  "Units": "metric"'
+                                 '}')
+    self.weatherApiConfiguration: WeatherServerConfiguration = TestWeatherServiceConfigurationFactory().get(weatherConfiguration)
+    
+    self.logger = Logger(__name__, 0, [getStdOutLogHandler()])
+    
+    self.weatherServices = [WeatherService(self.weatherApiConfiguration, GeolocationMappers(), WeatherMappers(), self.logger), BadWeatherServiceExample()]
 
 
-    def test_CreateService(self):
-        for service in self.weatherServices:
-            self.assertIsNotNone(service, f"Could not create instance for {service.__class__.__name__}")
+def test_CreateService(self):
+    for service in self.weatherServices:
+        self.assertIsNotNone(service, f"Could not create instance for {service.__class__.__name__}")
 ```
 
 ```python
@@ -383,7 +383,83 @@ C# examples here:
 Presentation here:
 * https://youtu.be/9e6ZQTftg08
 
+### State Pattern
+
+Design patterns are usually bundled together.
+
+![state pattern theory.png](images%2Fstate%20pattern%20theory.png)
+
+Example:
+![state pattern.png](images%2Fstate%20pattern.png)
+
+All states implement the same interface, 
+so adding new states to a state machine can be done without touching the code of the other states. 
+For this reason, using the **sate design patterns helps implement the open-close principle.**
+
+```python
+class LightSystem(IObserver):
+    def __init__(self, log: ILogger, timeout: int or None = None):
+        ...
+        self.turnOff()
+        ...
+    
+    def turnOn(self) -> None:
+        self.__currentState = On(self, self.__log)
+
+    def turnOff(self) -> None:
+        self.__currentState = Off(self, self.__log)
+
+    def update(self) -> None:
+        self.__log.info("Motion detected.")
+        self.__currentState.processMotionDetected()
+```
+
+```python
+class ILightState(ABC):
+    @abstractmethod
+    def processMotionDetected(self) -> None:
+        pass
+```
+
+```python
+class Off(ILightState):
+    def __init__(self, light, log: ILogger):
+        log.info("Turn off lights.")
+        self.__light = light
+
+    def processMotionDetected(self) -> None:
+        self.__light.turnOn()
+```
+
+```python
+class On(ILightState):
+    def __init__(self, light, log: ILogger):
+        ...
+        self.__log.info("Turn on lights.")
+        self.__light = light
+        
+        self.__timeoutTask = self.__getTimeoutTask()
+        self.__timeoutTask.start()
+        
+    def __getTimeoutTask(self) -> Timer:
+        return Timer(self.__light.timeout, self.__turnOffAfterTimeout, [])
+
+    def __turnOffAfterTimeout(self):
+        self.__log.info("Inactivity timeout reached.")
+        self.__light.turnOff()        
+
+    def processMotionDetected(self) -> None:
+        self.__timeoutTask.cancel()
+        self.__timeoutTask = self.__getTimeoutTask()
+        self.__timeoutTask.start()
+```
+
 ## Code smells
+Using design patterns bring best code practices to your code.
+But they also add needless complexity.
+
+What to look for?
+
 * **Rigidity**. The software is difficult to change. A small change causes a cascade of subsequent changes.
 * **Fragility**. The software breaks in many places due to a single change.
 * **Immobility**. You cannot reuse parts of the code in other projects because of involved risks and high effort.
@@ -393,17 +469,17 @@ Presentation here:
 
 ### Keep configuration data away from the source code.
 ```python
-    def getCurrentWeather(self, city: str, code: str, country: str) -> Weather or None:
-        key = "some key"
-        p = {'q': f'{city},{code},{country}', 'limit': 1, 'appid': key}
-        r = requests.get("http://api.openweathermap.org/geo/1.0/direct", params=p)
+def getCurrentWeather(self, city: str, code: str, country: str) -> Weather or None:
+    key = "some key"
+    p = {'q': f'{city},{code},{country}', 'limit': 1, 'appid': key}
+    r = requests.get("http://api.openweathermap.org/geo/1.0/direct", params=p)
 
-        try:
-            loc = self.__geolocationMapper.mapJsonToGeolocation(r.json()[0])
-            p = {'lat': loc.latitude, 'lon': loc.longitude, 'appid': key}
-            r = requests.get("http://api.openweathermap.org/data/2.5/weather", params=p)
-            return self.__weatherMapper.mapJsonToWeather(r.json())
-        except Exception as error:
-            self.__log.error(f"{error}")
-            return None
+    try:
+        loc = self.__geolocationMapper.mapJsonToGeolocation(r.json()[0])
+        p = {'lat': loc.latitude, 'lon': loc.longitude, 'appid': key}
+        r = requests.get("http://api.openweathermap.org/data/2.5/weather", params=p)
+        return self.__weatherMapper.mapJsonToWeather(r.json())
+    except Exception as error:
+        self.__log.error(f"{error}")
+        return None
 ```
