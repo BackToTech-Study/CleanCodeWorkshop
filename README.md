@@ -306,6 +306,12 @@ class AddCommand(ICommand):
 
 **Stable software architectures favor dependency on stable abstract interfaces. Stable components should not depend on volatile components.**
 
+C# examples here: 
+* https://github.com/BackToTech-Study/CommandPattern
+
+Presentation here:
+* https://youtu.be/lv5u7D4RoOg
+
 ### Limit dependencies.
 
 **A pure function has no side effects. For the same input value it will always generate the same result.**
@@ -370,6 +376,12 @@ class LightSystem(IObserver):
         self.__currentState.processMotionDetected()
 ```
 
+C# examples here: 
+* https://github.com/BackToTech-Study/ObserverPattern
+* https://learn.microsoft.com/en-us/dotnet/standard/events/observer-design-pattern
+
+Presentation here:
+* https://youtu.be/9e6ZQTftg08
 
 ## Code smells
 * **Rigidity**. The software is difficult to change. A small change causes a cascade of subsequent changes.
