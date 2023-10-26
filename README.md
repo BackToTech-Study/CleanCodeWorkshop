@@ -177,6 +177,10 @@ class TestWeatherServiceConfigurationFactory(ConfigurationFactoryDecorator):
 
 ```
 
+The invoker is not aware of how the command is executed, it only knows what command to invoke. 
+So the **command pattern helps us implement separation of concerns**, 
+because the invoker and receiver can change independently of each other.
+
 **Liskov Substitution Principle - Objects in a program should be replaceable with instances of their subtypes without altering the correctness of that program.**
 
 **Dependency Inversion Principle - Depend on abstractions, not concrete instances.**
@@ -302,7 +306,69 @@ class AddCommand(ICommand):
 
 **Stable software architectures favor dependency on stable abstract interfaces. Stable components should not depend on volatile components.**
 
-### Limit dependencies. Avoid side effects. See the concept of pure functions.
+### Limit dependencies.
+
+**A pure function has no side effects. For the same input value it will always generate the same result.**
+Pure functions are easier to test and reuse.
+
+```python
+def isNotPositiveResponse(statusCode):
+    return statusCode < 200 or statusCode > 300
+```
+
+```python
+def turnOn(self) -> None:
+    self.__currentState = On(self, self.__log)
+
+def turnOff(self) -> None:
+    self.__currentState = Off(self, self.__log)
+
+def update(self) -> None:
+    self.__log.info("Motion detected.")
+    self.__currentState.processMotionDetected()
+```        
+
+
+### Decoupling with the Observer Pattern
+
+The observer pattern helps implement pushing updates from one object (subject) to a runtime dynamic list of interested objects (observers).
+![observer pattern.png](images%2Fobserver%20pattern.png)
+The **subject is not dependent on the implementation of the observer** because 
+the subject only knows that the observer implements the observer interface.
+
+```python
+class MockMotionSensor(IMotionSensor):
+    ...
+    
+    def subscribe(self, observer: IObserver) -> None:
+        if observer is not None:
+            self.__observerCollection.append(observer)
+
+    def unsubscribe(self, observer: IObserver) -> None:
+        if observer is not None:
+            self.__observerCollection.remove(observer)
+
+    def __notifyObservers(self) -> None:
+        ...
+        for observer in self.__observerCollection:
+            observer.update()
+        ...
+```
+
+```python
+class IObserver(ABC):
+    @abstractmethod
+    def update(self) -> None:
+        pass
+```
+
+```python
+class LightSystem(IObserver):
+    ...
+    def update(self) -> None:
+        self.__log.info("Motion detected.")
+        self.__currentState.processMotionDetected()
+```
 
 
 ## Code smells
