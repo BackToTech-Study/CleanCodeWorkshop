@@ -1,3 +1,4 @@
+from samples.WeatherApi.configurations.Dynamic import Dynamic
 from samples.WeatherApi.configurations.LoggerConfiguration import LoggerConfiguration
 from samples.WeatherApi.configurations.WeatherServerConfiguration import WeatherServerConfiguration
 

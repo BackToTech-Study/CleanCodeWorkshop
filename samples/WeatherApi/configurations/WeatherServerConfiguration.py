@@ -1,3 +1,6 @@
+from samples.WeatherApi.configurations.Dynamic import Dynamic
+
+
 class WeatherServerConfiguration:
 
     @property
@@ -19,3 +22,7 @@ class WeatherServerConfiguration:
     @property
     def ApiKey(self) -> str:
         return self.ApiKey
+
+    @ApiKey.setter
+    def ApiKey(self, value) -> str:
+        self.ApiKey = value

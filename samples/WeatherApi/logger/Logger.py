@@ -1,5 +1,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
+
+from .ILogger import ILogger
 from ..configurations.LoggerConfiguration import LoggerConfiguration
 
 
@@ -9,19 +11,17 @@ def getFormatter() -> logging.Formatter:
 
 def getStdOutLogHandler():
     handler = logging.StreamHandler()
-    handler.setLevel(logging.INFO)
     handler.setFormatter(getFormatter())
     return handler
 
 
 def getRollingFileLogHandler(fileName, maxBytes, backupCount):
     handler = RotatingFileHandler(fileName, maxBytes=maxBytes, backupCount=backupCount)
-    handler.setLevel(logging.INFO)
     handler.setFormatter(getFormatter())
     return handler
 
 
-class Logger:
+class Logger(ILogger):
     def __init__(self, loggerName: str, level: int, handlerCollection: []):
         self.__logger = logging.getLogger(loggerName)
 

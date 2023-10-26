@@ -2,7 +2,7 @@ from samples.WeatherApi.models.Weather import Weather
 
 
 class WeatherMappers:
-    def mapJsonToWeather(self, json) -> Weather:
+    def fromJson(self, json) -> Weather:
         result = Weather()
         result.temperature = json['main']['temp']
         result.minTemperature = json['main']['temp_min']

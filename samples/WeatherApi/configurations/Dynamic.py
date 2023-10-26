@@ -9,14 +9,14 @@ class Dynamic:
         return obj
 
     @classmethod
+    def fromJson(cls, jsonString: str):
+        if not jsonString:
+            return None
+        return json.loads(jsonString, object_hook=cls.fromDict)
+
+    @classmethod
     def fromFile(cls, source):
         rawData = None
         with open(source) as inputStream:
             rawData = inputStream.read()
         return cls.fromJson(rawData)
-
-    @classmethod
-    def fromJson(cls, jsonString: str):
-        if not jsonString:
-            return None
-        return json.loads(jsonString, object_hook=cls.fromDict)

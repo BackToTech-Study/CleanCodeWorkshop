@@ -2,14 +2,14 @@ import jsonpickle
 from flask import Blueprint, request
 
 from samples.WeatherApi.helpers.HttpHelpers import getParameterValue
-from samples.WeatherApi.logger.Logger import Logger
+from samples.WeatherApi.logger.ILogger import ILogger
 from samples.WeatherApi.services.IWeatherService import IWeatherService
 
 weatherController = Blueprint('WeatherController', __name__)
 
 
 @weatherController.route('', methods=['GET'])
-def getCurrentWeather(weatherService: IWeatherService, logger: Logger):
+def getCurrentWeather(weatherService: IWeatherService, logger: ILogger):
     city, error = getParameterValue(str, 'City', request)
     if city is None:
         logger.error(f"City parameter error: {error}")

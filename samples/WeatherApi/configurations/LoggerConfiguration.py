@@ -1,3 +1,6 @@
+from samples.WeatherApi.configurations.Dynamic import Dynamic
+
+
 class LoggerConfiguration:
 
     @property

@@ -1,3 +1,5 @@
+import os
+
 import requests
 
 from samples.WeatherApi.logger.Logger import Logger, getStdOutLogHandler
@@ -14,15 +16,15 @@ class BadWeatherServiceExample(IWeatherService):
         self.__weatherMapper = WeatherMappers()
 
     def getCurrentWeather(self, city: str, code: str, country: str) -> Weather or None:
-        key = "b4ee712c33e4cd9e785d8bbf032b1652"
+        key = os.getenv('API_KEY')
         p = {'q': f'{city},{code},{country}', 'limit': 1, 'appid': key}
         r = requests.get("http://api.openweathermap.org/geo/1.0/direct", params=p)
 
         try:
-            loc = self.__geolocationMapper.mapJsonToGeolocation(r.json()[0])
+            loc = self.__geolocationMapper.fromJson(r.json()[0])
             p = {'lat': loc.latitude, 'lon': loc.longitude, 'appid': key}
             r = requests.get("http://api.openweathermap.org/data/2.5/weather", params=p)
-            return self.__weatherMapper.mapJsonToWeather(r.json())
+            return self.__weatherMapper.fromJson(r.json())
         except Exception as error:
             self.__log.error(f"{error}")
             return None
